@@ -4,6 +4,8 @@
 @inject AttendanceService AttendanceTracker
 @using EventEaseApp.Models
 
+@inject AuthService Auth
+
 
 
 <h1>Event Registration</h1>
@@ -12,7 +14,7 @@
 <p><strong>Date:</strong> @eventDate?.ToString("MMMM dd, yyyy")</p>
 <p><strong>Location:</strong> @location</p>
 
-<form>
+<form @onsubmit="SubmitRegistration">
     <div class="form-group">
         <label>Name:</label>
         <input type="text" class="form-control" placeholder="Enter your name" @bind="userName" required />
@@ -36,10 +38,15 @@
 
     protected override void OnInitialized()
     {
+        if (!Auth.IsLoggedIn)
+        {
+            NavManager.NavigateTo("/login"); // Redirect to login if user is not authenticated
+        }
+
         var query = NavManager.ToAbsoluteUri(NavManager.Uri).Query;
         var parameters = System.Web.HttpUtility.ParseQueryString(query);
 
-        eventName = parameters["name"];
+        eventName = parameters["name"] ?? "Default Event";
         location = parameters["location"];
         if (DateTime.TryParse(parameters["date"], out var parsedDate))
         {

@@ -1,18 +1,57 @@
 ﻿@page "/events"
 @using EventEaseApp.Models
 @using EventEaseApp.Shared
+@using EventEaseApp.Services
+@inject AuthService Auth
+@inject NavigationManager NavManager
 
 <h1>Upcoming Events</h1>
-@foreach (var eventItem in events)
+
+@if (!Auth.IsLoggedIn)
 {
-    <EventCard EventName="@eventItem.Name" EventDate="@eventItem.Date" Location="@eventItem.Location" />
+    NavManager.NavigateTo("/login"); // Redirect to login if user is not authenticated
+}
+else
+{
+    <!-- Event Input Form -->
+    <div class="add-event-form">
+        <h2>Add a New Event</h2>
+        <input type="text" class="form-control" @bind="newEvent.Name" placeholder="Event Name" />
+        <input type="date" class="form-control" @bind="newEvent.Date" />
+        <input type="text" class="form-control" @bind="newEvent.Location" placeholder="Location" />
+        <input type="text" class="form-control" @bind="newEvent.Description" placeholder="Description" />
+        <button class="btn btn-success" @onclick="AddEvent">Add Event</button>
+    </div>
+
+    <!-- Virtualized Event List -->
+    <Virtualize TItem="Event" Items="@events">
+        <EventCard @key="context.Name" EventName="@context.Name" EventDate="@context.Date" Location="@context.Location" Description="@context.Description" />
+    </Virtualize>
 }
 
 @code {
-    private List<Event> events = new()
+    private ICollection<Event> events = new List<Event>
     {
-        new Event { Name = "Tech Summit 2025", Date = new DateTime(2025, 6, 10), Location = "Manila", Description = "A premier technology conference." },
-        new Event { Name = "Business Expo", Date = new DateTime(2025, 7, 22), Location = "Quezon City", Description = "Showcasing innovation in business." },
-        new Event { Name = "Startup Conclave", Date = new DateTime(2025, 8, 15), Location = "Makati", Description = "Connecting startup founders and investors." }
+        new Event { Name = "Tech Summit 2025", Date = new DateTime(2025, 6, 10), Location = "Los Angeles", Description = "A premier technology conference." },
+        new Event { Name = "Business Expo", Date = new DateTime(2025, 7, 22), Location = "New York City", Description = "Showcasing innovation in business." },
+        new Event { Name = "Startup Conclave", Date = new DateTime(2025, 8, 15), Location = "Los Angeles", Description = "Connecting startup founders and investors." }
     };
+
+    private Event newEvent = new Event();
+
+    private void AddEvent()
+    {
+        if (!string.IsNullOrWhiteSpace(newEvent.Name))
+        {
+            events.Add(new Event
+                {
+                    Name = newEvent.Name,
+                    Date = newEvent.Date,
+                    Location = newEvent.Location,
+                    Description = newEvent.Description
+                });
+
+            newEvent = new Event(); // Clear the input fields
+        }
+    }
 }

@@ -4,10 +4,17 @@
     [Parameter] public string EventName { get; set; } = string.Empty;
     [Parameter] public DateTime EventDate { get; set; }
     [Parameter] public string Location { get; set; } = string.Empty;
-
+    [Parameter] public string Description { get; set; } = string.Empty;
+    
     private void Register()
     {
         NavManager.NavigateTo($"/register?name={Uri.EscapeDataString(EventName)}&date={EventDate:yyyy-MM-dd}&location={Uri.EscapeDataString(Location)}");
+    }
+
+    private void ViewDetails()
+    {
+        Console.WriteLine($"Navigating with: {Description}"); // Debugging step
+        NavManager.NavigateTo($"/view-details?name={Uri.EscapeDataString(EventName)}&date={EventDate:yyyy-MM-dd}&location={Uri.EscapeDataString(Location)}&desc={Uri.EscapeDataString(Description)}");
     }
 }
 
@@ -15,5 +22,12 @@
     <h2>@EventName</h2>
     <p><strong>Date:</strong> @EventDate.ToString("MMMM dd, yyyy")</p>
     <p><strong>Location:</strong> @Location</p>
-    <button class="btn" @onclick="Register">Register</button>
+    <div style="display:flex;gap:5px;">
+        <button class="btn" @onclick="Register">Register</button><button class="btn" @onclick="ViewDetails">View Details</button>
+    </div>
+    <input type="text" @bind="EventName" placeholder="Enter event name" />
+    <input type="date" @bind="EventDate"  />
+    <input type="text" @bind="Location"  placeholder="Enter location" />
+    <input type="text" @bind="Description"  placeholder="Enter event description" />
+
 </div>

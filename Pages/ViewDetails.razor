@@ -1,0 +1,36 @@
+﻿@page "/view-details"
+@inject NavigationManager NavManager
+@using EventEaseApp.Services
+@inject AttendanceService AttendanceTracker
+@using EventEaseApp.Models
+@using EventEaseApp.Services
+@inject AuthService Auth
+
+<h3>View Details</h3>
+<p><strong>Event Name:</strong> @eventName</p>
+<p><strong>Date:</strong> @eventDate?.ToString("MMMM dd, yyyy")</p>
+<p><strong>Location:</strong> @location</p>
+<p><strong>Description:</strong> @description</p>
+@code {
+    private string? eventName;
+    private DateTime? eventDate;
+    private string? location;
+    private string? description;
+    protected override void OnInitialized()
+    {
+        if (!Auth.IsLoggedIn)
+        {
+            NavManager.NavigateTo("/login"); // Redirect to login if user is not authenticated
+        }
+        var query = NavManager.ToAbsoluteUri(NavManager.Uri).Query;
+        var parameters = System.Web.HttpUtility.ParseQueryString(query);
+        
+        eventName = parameters["name"] ?? "Default Event";
+        location = parameters["location"];
+        description = parameters["desc"];
+        if (DateTime.TryParse(parameters["date"], out var parsedDate))
+        {
+            eventDate = parsedDate;
+        }
+    }
+}

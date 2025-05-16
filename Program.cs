@@ -7,6 +7,8 @@ using System.Net.Http;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddSingleton<EventService>();
 builder.Services.AddSingleton<AttendanceService>();
+builder.Services.AddScoped<AuthService>();
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 

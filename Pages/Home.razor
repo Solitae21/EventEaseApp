@@ -1,5 +1,7 @@
 ﻿@page "/"
 @inject NavigationManager NavManager
+@using EventEaseApp.Services
+@inject AuthService Auth
 
 <PageTitle>Home</PageTitle>
 
@@ -15,6 +17,13 @@
 @code {
     private void GoToEvents()
     {
-        NavManager.NavigateTo("/events"); // Redirects to Events List
+        if (Auth.IsLoggedIn)
+        {
+            NavManager.NavigateTo("/events"); // Redirects to Events List
+        }
+        else
+        {
+            NavManager.NavigateTo("/login"); // Redirects to Login Page
+        }
     }
 }

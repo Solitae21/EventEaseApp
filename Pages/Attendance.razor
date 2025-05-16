@@ -2,8 +2,10 @@
 @using EventEaseApp.Models
 @using EventEaseApp.Services
 @inject AttendanceService AttendanceTracker
+@inject AuthService Auth
+@inject NavigationManager NavManager
 
-<h1>My Registered Events</h1>
+<h1>My Registered Events (User: @Auth.UserName)</h1>
 
 <div class="attendance-container">
     @if (registrations.Count == 0)
@@ -43,6 +45,10 @@
 
     protected override void OnInitialized()
     {
+        if (!Auth.IsLoggedIn)
+        {
+            NavManager.NavigateTo("/login"); // Redirect to login if user is not authenticated
+        }
         registrations = AttendanceTracker.GetRegistrations();
     }
 }

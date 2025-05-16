@@ -1,0 +1,25 @@
+﻿@using EventEaseApp.Services
+@inject AuthService Auth
+@inject NavigationManager NavManager
+@page "/login"
+<h2>Login</h2>
+
+<div class="form-group">
+    <label>Name:</label>
+    <input type="text" class="form-control" @bind="UserName" placeholder="Enter your name" required />
+</div>
+
+<button class="btn btn-success" @onclick="Login">Login</button>
+
+@code {
+    private string UserName = string.Empty;
+
+    private void Login()
+    {
+        if (!string.IsNullOrWhiteSpace(UserName))
+        {
+            Auth.Login(UserName);
+            NavManager.NavigateTo("/events"); // Redirect after login
+        }
+    }
+}
