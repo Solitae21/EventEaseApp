@@ -1,13 +1,19 @@
-﻿<div class="card p-3 mb-3" style="width: 18rem;">
-    <h5 class="card-title">@EventName</h5>
-    <p class="card-text">
-        <strong>Date:</strong> @EventDate.ToShortDateString() <br />
-        <strong>Location:</strong> @Location
-    </p>
-</div>
+﻿@inject NavigationManager NavManager
 
 @code {
-    [Parameter] public string EventName { get; set; } = "Sample Event";
-    [Parameter] public DateTime EventDate { get; set; } = DateTime.Now;
-    [Parameter] public string Location { get; set; } = "Sample Location";
+    [Parameter] public string EventName { get; set; } = string.Empty;
+    [Parameter] public DateTime EventDate { get; set; }
+    [Parameter] public string Location { get; set; } = string.Empty;
+
+    private void Register()
+    {
+        NavManager.NavigateTo($"/register?name={Uri.EscapeDataString(EventName)}&date={EventDate:yyyy-MM-dd}&location={Uri.EscapeDataString(Location)}");
+    }
 }
+
+<div class="event-card">
+    <h2>@EventName</h2>
+    <p><strong>Date:</strong> @EventDate.ToString("MMMM dd, yyyy")</p>
+    <p><strong>Location:</strong> @Location</p>
+    <button class="btn" @onclick="Register">Register</button>
+</div>

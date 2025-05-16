@@ -1,7 +1,20 @@
 ﻿@page "/"
+@inject NavigationManager NavManager
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+
+<div class="home-container">
+    <h1>Welcome to EventEase 🎉</h1>
+    <p>Your go-to platform for managing and attending exciting corporate and social events.</p>
+
+    <button class="btn btn-primary" @onclick="GoToEvents">Browse Events</button>
+</div>
+
+@code {
+    private void GoToEvents()
+    {
+        NavManager.NavigateTo("/events"); // Redirects to Events List
+    }
+}

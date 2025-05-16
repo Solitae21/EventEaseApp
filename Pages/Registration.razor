@@ -1,54 +1,72 @@
-﻿@using System.ComponentModel.DataAnnotations
-@page "/register"
-<h3 class="mb-3">Event Registration</h3>
-<EditForm Model="registrationModel" OnValidSubmit="HandleSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+﻿@page "/register"
+@inject NavigationManager NavManager
+@using EventEaseApp.Services
+@inject AttendanceService AttendanceTracker
+@using EventEaseApp.Models
 
-    <div class="mb-3">
-        <label for="name">Name:</label>
-        <InputText id="name" @bind-Value="registrationModel.Name" class="form-control" />
+
+
+<h1>Event Registration</h1>
+
+<p><strong>Event Name:</strong> @eventName</p>
+<p><strong>Date:</strong> @eventDate?.ToString("MMMM dd, yyyy")</p>
+<p><strong>Location:</strong> @location</p>
+
+<form>
+    <div class="form-group">
+        <label>Name:</label>
+        <input type="text" class="form-control" placeholder="Enter your name" @bind="userName" required />
     </div>
 
-    <div class="mb-3">
-        <label for="email">Email:</label>
-        <InputText id="email" @bind-Value="registrationModel.Email" class="form-control" />
+    <div class="form-group">
+        <label>Email:</label>
+        <input type="email" class="form-control" placeholder="Enter your email" @bind="userEmail" required />
     </div>
 
-    <button type="submit" class="btn btn-primary">Register</button>
-</EditForm>
-
-@if (isRegistered)
-{
-    <div class="alert alert-success mt-3">
-        Successfully registered: @registeredName (@registeredEmail)
-    </div>
-}
+    <button class="btn btn-success" type="submit">Submit</button>
+    <button class="btn btn-danger" type="button" @onclick="Cancel">Cancel</button>
+</form>
 
 @code {
-    private RegistrationModel registrationModel = new RegistrationModel();
-    private bool isRegistered = false;
-    private string registeredName = "";
-    private string registeredEmail = "";
+    private string? eventName;
+    private DateTime? eventDate;
+    private string? location;
+    private string? userName;
+    private string? userEmail;
 
-    private void HandleSubmit()
+    protected override void OnInitialized()
     {
-        registeredName = registrationModel.Name;
-        registeredEmail = registrationModel.Email;
-        isRegistered = true;
+        var query = NavManager.ToAbsoluteUri(NavManager.Uri).Query;
+        var parameters = System.Web.HttpUtility.ParseQueryString(query);
 
-        // Clear the form after successful registration
-        registrationModel = new RegistrationModel();
-        Console.WriteLine($"Registered: {registeredName} - {registeredEmail}");
+        eventName = parameters["name"];
+        location = parameters["location"];
+        if (DateTime.TryParse(parameters["date"], out var parsedDate))
+        {
+            eventDate = parsedDate;
+        }
     }
 
-    public class RegistrationModel
+    private void Cancel()
     {
-        [Required(ErrorMessage = "Name is required")]
-        public string Name { get; set; } = string.Empty;
+        NavManager.NavigateTo("/events"); // Redirects back to the events page
+    }
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
-        public string Email { get; set; } = string.Empty;
+    private void SubmitRegistration()
+    {
+        if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(userEmail))
+        {
+            var registration = new AttendanceModel
+                {
+                    EventName = eventName ?? "",
+                    EventDate = eventDate ?? DateTime.Now,
+                    Location = location ?? "",
+                    UserName = userName,
+                    UserEmail = userEmail
+                };
+
+            AttendanceTracker.RegisterUser(registration);
+            NavManager.NavigateTo("/attendance"); // Redirect to attendance tracker page
+        }
     }
 }

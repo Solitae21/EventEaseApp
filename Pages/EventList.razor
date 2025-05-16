@@ -1,57 +1,18 @@
 ﻿@page "/events"
-@using EventEaseApp.Services
-@inject UserSession UserSession
+@using EventEaseApp.Models
+@using EventEaseApp.Shared
 
-<h3 class="mb-3">Event List</h3>
-
-<div class="container">
-    @foreach (var eventItem in events)
-    {
-        <div class="card mb-3" @key="eventItem.EventName">
-            <EventCard EventName="@eventItem.EventName" EventDate="@eventItem.EventDate" Location="@eventItem.Location" />
-
-            @{
-                bool isRegistered = UserSession.RegisteredEvents.Contains(eventItem.EventName);
-            }
-
-            @if (isRegistered)
-            {
-                <div class="mt-2 text-success fw-bold">You're registered!</div>
-            }
-            else
-            {
-                <button class="btn btn-primary mt-2" @onclick="() => RegisterEvent(eventItem.EventName)">Register</button>
-            }
-        </div>
-    }
-</div>
+<h1>Upcoming Events</h1>
+@foreach (var eventItem in events)
+{
+    <EventCard EventName="@eventItem.Name" EventDate="@eventItem.Date" Location="@eventItem.Location" />
+}
 
 @code {
-    public class EventModel
+    private List<Event> events = new()
     {
-        public string EventName { get; set; } = string.Empty;
-        public DateTime EventDate { get; set; }
-        public string Location { get; set; } = string.Empty;
-    }
-
-    private List<EventModel> events = new();
-
-    protected override void OnInitialized()
-    {
-        events = Enumerable.Range(1, 1000).Select(i => new EventModel
-        {
-            EventName = $"Event {i}",
-            EventDate = DateTime.Now.AddDays(i),
-            Location = $"Location {i}"
-        }).ToList();
-    }
-
-    private void RegisterEvent(string eventName)
-    {
-        if (!UserSession.RegisteredEvents.Contains(eventName))
-        {
-            UserSession.RegisteredEvents.Add(eventName);
-            StateHasChanged(); // Update UI after registration
-        }
-    }
+        new Event { Name = "Tech Summit 2025", Date = new DateTime(2025, 6, 10), Location = "Manila", Description = "A premier technology conference." },
+        new Event { Name = "Business Expo", Date = new DateTime(2025, 7, 22), Location = "Quezon City", Description = "Showcasing innovation in business." },
+        new Event { Name = "Startup Conclave", Date = new DateTime(2025, 8, 15), Location = "Makati", Description = "Connecting startup founders and investors." }
+    };
 }

@@ -1,0 +1,48 @@
+﻿@page "/attendance"
+@using EventEaseApp.Models
+@using EventEaseApp.Services
+@inject AttendanceService AttendanceTracker
+
+<h1>My Registered Events</h1>
+
+<div class="attendance-container">
+    @if (registrations.Count == 0)
+    {
+        <p class="no-events">No registrations yet.</p>
+    }
+    else
+    {
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>User</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reg in registrations)
+                {
+                    <tr>
+                        <td>@reg.EventName</td>
+                        <td>@reg.EventDate.ToString("MMMM dd, yyyy")</td>
+                        <td>@reg.Location</td>
+                        <td>@reg.UserName</td>
+                        <td>@reg.UserEmail</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<AttendanceModel> registrations = new();
+
+    protected override void OnInitialized()
+    {
+        registrations = AttendanceTracker.GetRegistrations();
+    }
+}
